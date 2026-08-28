@@ -22,6 +22,74 @@ textarea {
     #080c14;
 }
 
+.explanation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid #202a39;
+}
+
+.explanation-item {
+  padding: 20px;
+  background: #0c121c;
+  border-right: 1px solid #202a39;
+  border-bottom: 1px solid #202a39;
+}
+
+.explanation-item:nth-child(2) {
+  border-right: none;
+}
+
+.explanation-wide {
+  grid-column: 1 / -1;
+  border-right: none;
+}
+
+.explanation-item span {
+  display: block;
+  margin-bottom: 8px;
+  color: #718096;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.explanation-item strong {
+  display: block;
+  color: #dce5f3;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.explanation-item code {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 14px;
+  box-sizing: border-box;
+  background: #070b12;
+  border: 1px solid #202b3a;
+  border-radius: 7px;
+  color: #9eabc0;
+  font: 11px/1.7 Consolas, "Cascadia Code", monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  overflow-x: auto;
+}
+
+@media (max-width: 700px) {
+  .explanation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .explanation-item,
+  .explanation-item:nth-child(2),
+  .explanation-wide {
+    grid-column: auto;
+    border-right: none;
+  }
+}
+
 .navbar {
   height: 64px;
   padding: 0 24px;
@@ -403,4 +471,35 @@ footer {
     gap: 15px;
     flex-direction: column;
   }
+}
+.examples {
+  padding: 10px 15px;
+  border-top: 1px solid #1d2735;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.examples > span {
+  color: #657287;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin-right: 4px;
+}
+
+.examples button {
+  border: 1px solid #29364a;
+  background: #111824;
+  color: #8794a8;
+  padding: 6px 9px;
+  border-radius: 6px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.examples button:hover {
+  background: #182130;
+  color: #c3cddd;
 }

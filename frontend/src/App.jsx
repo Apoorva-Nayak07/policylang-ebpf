@@ -5,6 +5,39 @@ const DEFAULT_POLICY = `allow ingress
 when source.ip == "10.0.0.5"
 and destination.port == 443`
 
+const EXAMPLES = [
+  {
+    name: 'HTTPS Allow',
+    policy: `allow ingress
+when destination.port == 443`,
+  },
+  {
+    name: 'SSH Deny',
+    policy: `deny ingress
+when destination.port == 22`,
+  },
+  {
+    name: 'HTTP or HTTPS',
+    policy: `allow ingress
+when destination.port == 80
+or destination.port == 443`,
+  },
+  {
+    name: 'Source IP',
+    policy: `allow ingress
+when source.ip == "10.0.0.5"`,
+  },
+]
+
+const STAGES = [
+  ['lexer', 'Lexer'],
+  ['parser', 'Parser'],
+  ['semantic_analysis', 'Semantic Analysis'],
+  ['ir_lowering', 'IR Lowering'],
+  ['optimization', 'Optimizer'],
+  ['ebpf_generation', 'eBPF Generation'],
+]
+
 function App() {
   const [source, setSource] = useState(DEFAULT_POLICY)
   const [loading, setLoading] = useState(false)
@@ -35,7 +68,11 @@ function App() {
 
       setResult(data)
     } catch (err) {
-      setError(err.message)
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Unable to connect to the compiler API'
+      )
     } finally {
       setLoading(false)
     }
@@ -44,15 +81,19 @@ function App() {
   const copyCode = async () => {
     if (!result?.ebpf_code) return
 
-    await navigator.clipboard.writeText(result.ebpf_code)
-    alert('eBPF C code copied!')
+    try {
+      await navigator.clipboard.writeText(result.ebpf_code)
+      window.alert('eBPF C code copied!')
+    } catch {
+      window.alert('Unable to copy code.')
+    }
   }
 
   const downloadCode = () => {
     if (!result?.ebpf_code) return
 
     const blob = new Blob([result.ebpf_code], {
-      type: 'text/plain',
+      type: 'text/plain;charset=utf-8',
     })
 
     const url = URL.createObjectURL(blob)
@@ -60,19 +101,18 @@ function App() {
 
     link.href = url
     link.download = 'policy.bpf.c'
+    document.body.appendChild(link)
     link.click()
+    link.remove()
 
     URL.revokeObjectURL(url)
   }
 
-  const stages = [
-    ['lexer', 'Lexer'],
-    ['parser', 'Parser'],
-    ['semantic_analysis', 'Semantic Analysis'],
-    ['ir_lowering', 'IR Lowering'],
-    ['optimization', 'Optimizer'],
-    ['ebpf_generation', 'eBPF Generation'],
-  ]
+  const loadExample = (example) => {
+    setSource(example.policy)
+    setResult(null)
+    setError('')
+  }
 
   return (
     <div className="app">
@@ -93,6 +133,7 @@ function App() {
       </header>
 
       <main>
+        {/* HERO */}
         <section className="hero-section">
           <div className="eyebrow">eBPF POLICY COMPILER</div>
 
@@ -117,6 +158,7 @@ function App() {
           </div>
         </section>
 
+        {/* POLICY EDITOR */}
         <section className="card editor-card">
           <div className="card-header">
             <div>
@@ -129,24 +171,48 @@ function App() {
 
           <textarea
             value={source}
-            onChange={(event) => setSource(event.target.value)}
+            onChange={(event) => {
+              setSource(event.target.value)
+
+              // Clear previous compiler result when policy changes.
+              if (result) setResult(null)
+              if (error) setError('')
+            }}
             spellCheck="false"
             placeholder="Write your PolicyLang policy here..."
           />
 
+          {/* EXAMPLES */}
+          <div className="examples">
+            <span>EXAMPLES</span>
+
+            {EXAMPLES.map((example) => (
+              <button
+                key={example.name}
+                type="button"
+                onClick={() => loadExample(example)}
+              >
+                {example.name}
+              </button>
+            ))}
+          </div>
+
+          {/* EDITOR FOOTER */}
           <div className="editor-footer">
             <span>PolicyLang syntax</span>
 
             <button
+              type="button"
               className="compile-button"
               onClick={compilePolicy}
-              disabled={loading}
+              disabled={loading || !source.trim()}
             >
               {loading ? 'Compiling...' : '▶ Compile Policy'}
             </button>
           </div>
         </section>
 
+        {/* ERROR */}
         {error && (
           <section className="error-box">
             <strong>Compilation Failed</strong>
@@ -154,8 +220,42 @@ function App() {
           </section>
         )}
 
+        {/* RESULTS */}
         {result && (
           <>
+            {/* EXPLAINABILITY */}
+            <section className="card explanation-card">
+              <div className="card-header">
+                <div>
+                  <small>EXPLAINABILITY</small>
+                  <h3>Policy Explanation</h3>
+                </div>
+
+                <span className="success-badge">SUCCESS</span>
+              </div>
+
+              <div className="explanation-grid">
+                <div className="explanation-item">
+                  <span>Action</span>
+                  <strong>{result.policy?.action || '—'}</strong>
+                </div>
+
+                <div className="explanation-item">
+                  <span>Direction</span>
+                  <strong>{result.policy?.direction || '—'}</strong>
+                </div>
+
+                <div className="explanation-item explanation-wide">
+                  <span>Intermediate Representation</span>
+
+                  <code>
+                    {result.ir || 'IR not returned by the API'}
+                  </code>
+                </div>
+              </div>
+            </section>
+
+            {/* PIPELINE */}
             <section className="card pipeline-card">
               <div className="card-header">
                 <div>
@@ -167,12 +267,13 @@ function App() {
               </div>
 
               <div className="pipeline">
-                {stages.map(([key, label]) => (
+                {STAGES.map(([key, label]) => (
                   <div className="pipeline-stage" key={key}>
                     <div className="stage-check">✓</div>
 
                     <div>
                       <b>{label}</b>
+
                       <span>
                         {result.stages?.[key] === 'success'
                           ? 'Completed successfully'
@@ -184,6 +285,7 @@ function App() {
               </div>
             </section>
 
+            {/* GENERATED eBPF */}
             <section className="card output-card">
               <div className="card-header">
                 <div>
@@ -192,8 +294,13 @@ function App() {
                 </div>
 
                 <div className="output-actions">
-                  <button onClick={copyCode}>Copy</button>
-                  <button onClick={downloadCode}>Download .bpf.c</button>
+                  <button type="button" onClick={copyCode}>
+                    Copy
+                  </button>
+
+                  <button type="button" onClick={downloadCode}>
+                    Download .bpf.c
+                  </button>
                 </div>
               </div>
 
@@ -201,7 +308,7 @@ function App() {
                 <span></span>
                 <span></span>
                 <span></span>
-                build / policy.bpf.c
+                {result.output_file || 'build / policy.bpf.c'}
               </div>
 
               <pre>
@@ -211,6 +318,7 @@ function App() {
           </>
         )}
 
+        {/* INFORMATION CARDS */}
         <section className="info-grid">
           <div className="card info-card">
             <small>LANGUAGE</small>
@@ -227,7 +335,9 @@ function App() {
           <div className="card info-card">
             <small>SUPPORTED</small>
             <h3>IPv4 · TCP · UDP · ICMP</h3>
-            <p>Network fields, comparisons and logical conditions.</p>
+            <p>
+              Network fields, comparisons and logical conditions.
+            </p>
           </div>
         </section>
       </main>
