@@ -4,6 +4,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from compiler.backend.ebpf_generator import generate_ebpf_c
+from compiler.ir.ir import IRComparison, IRLogical
 from compiler.ir.lower import lower_policy
 from compiler.optimizer.optimizer import optimize_policy
 from compiler.parser.parser import parse
@@ -12,6 +13,33 @@ from compiler.semantic.analyzer import analyze
 
 app = Flask(__name__)
 CORS(app)
+
+
+def build_explanation(condition):
+    """
+    Convert IR conditions into a frontend-friendly structure.
+    """
+
+    if isinstance(condition, IRComparison):
+        return [
+            {
+                "field": condition.field,
+                "operator": condition.operator,
+                "value": condition.value,
+            }
+        ]
+
+    if isinstance(condition, IRLogical):
+        left = build_explanation(condition.left)
+        right = build_explanation(condition.right)
+
+        return left + [
+            {
+                "logical_operator": condition.operator,
+            }
+        ] + right
+
+    return []
 
 
 @app.get("/health")
@@ -48,12 +76,12 @@ def compile_policy():
         policy = parse(source)
 
         # ---------------------------------------------------------
-        # 2. Semantic analysis
+        # 2. Semantic Analysis
         # ---------------------------------------------------------
         analyze(policy)
 
         # ---------------------------------------------------------
-        # 3. Lower AST -> IR
+        # 3. AST -> IR
         # ---------------------------------------------------------
         ir = lower_policy(policy)
 
@@ -63,7 +91,7 @@ def compile_policy():
         optimized_ir = optimize_policy(ir)
 
         # ---------------------------------------------------------
-        # 5. Generate eBPF C
+        # 5. Generate eBPF
         # ---------------------------------------------------------
         ebpf_code = generate_ebpf_c(optimized_ir)
 
@@ -81,7 +109,14 @@ def compile_policy():
         )
 
         # ---------------------------------------------------------
-        # Return compiler result
+        # Structured explanation
+        # ---------------------------------------------------------
+        explanation = build_explanation(
+            optimized_ir.condition
+        )
+
+        # ---------------------------------------------------------
+        # Response
         # ---------------------------------------------------------
         return jsonify({
             "success": True,
@@ -101,6 +136,8 @@ def compile_policy():
             },
 
             "ir": repr(optimized_ir),
+
+            "explanation": explanation,
 
             "output_file": str(output_path),
 

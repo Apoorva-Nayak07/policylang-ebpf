@@ -38,6 +38,19 @@ const STAGES = [
   ['ebpf_generation', 'eBPF Generation'],
 ]
 
+const FIELD_LABELS = {
+  SRC_IP: 'Source IP',
+  DST_IP: 'Destination IP',
+  SRC_PORT: 'Source Port',
+  DST_PORT: 'Destination Port',
+  PROTOCOL: 'Protocol',
+}
+
+const OPERATOR_LABELS = {
+  EQ: '==',
+  NE: '!=',
+}
+
 function App() {
   const [source, setSource] = useState(DEFAULT_POLICY)
   const [loading, setLoading] = useState(false)
@@ -101,6 +114,7 @@ function App() {
 
     link.href = url
     link.download = 'policy.bpf.c'
+
     document.body.appendChild(link)
     link.click()
     link.remove()
@@ -114,8 +128,53 @@ function App() {
     setError('')
   }
 
+  const renderConditions = () => {
+    if (!result?.explanation || result.explanation.length === 0) {
+      return (
+        <div className="empty-conditions">
+          No structured conditions returned by the compiler.
+        </div>
+      )
+    }
+
+    return result.explanation.map((item, index) => {
+      if (item.logical_operator) {
+        return (
+          <div
+            className="logical-operator"
+            key={`logical-${index}`}
+          >
+            {item.logical_operator}
+          </div>
+        )
+      }
+
+      return (
+        <div
+          className="condition-row"
+          key={`condition-${index}`}
+        >
+          <span className="condition-field">
+            {FIELD_LABELS[item.field] || item.field}
+          </span>
+
+          <strong className="condition-operator">
+            {OPERATOR_LABELS[item.operator] || item.operator}
+          </strong>
+
+          <code className="condition-value">
+            {String(item.value)}
+          </code>
+        </div>
+      )
+    })
+  }
+
   return (
     <div className="app">
+      {/* ------------------------------------------------------- */}
+      {/* HEADER */}
+      {/* ------------------------------------------------------- */}
       <header className="navbar">
         <div className="brand">
           <div className="brand-icon">λ</div>
@@ -133,9 +192,13 @@ function App() {
       </header>
 
       <main>
+        {/* ----------------------------------------------------- */}
         {/* HERO */}
+        {/* ----------------------------------------------------- */}
         <section className="hero-section">
-          <div className="eyebrow">eBPF POLICY COMPILER</div>
+          <div className="eyebrow">
+            eBPF POLICY COMPILER
+          </div>
 
           <h1>
             Write policies.
@@ -144,8 +207,8 @@ function App() {
           </h1>
 
           <p>
-            Define network security policies using PolicyLang and compile them
-            into efficient eBPF programs.
+            Define network security policies using PolicyLang and
+            compile them into efficient eBPF programs.
           </p>
 
           <div className="stage-card">
@@ -158,7 +221,9 @@ function App() {
           </div>
         </section>
 
+        {/* ----------------------------------------------------- */}
         {/* POLICY EDITOR */}
+        {/* ----------------------------------------------------- */}
         <section className="card editor-card">
           <div className="card-header">
             <div>
@@ -174,9 +239,13 @@ function App() {
             onChange={(event) => {
               setSource(event.target.value)
 
-              // Clear previous compiler result when policy changes.
-              if (result) setResult(null)
-              if (error) setError('')
+              if (result) {
+                setResult(null)
+              }
+
+              if (error) {
+                setError('')
+              }
             }}
             spellCheck="false"
             placeholder="Write your PolicyLang policy here..."
@@ -212,7 +281,9 @@ function App() {
           </div>
         </section>
 
+        {/* ----------------------------------------------------- */}
         {/* ERROR */}
+        {/* ----------------------------------------------------- */}
         {error && (
           <section className="error-box">
             <strong>Compilation Failed</strong>
@@ -220,10 +291,14 @@ function App() {
           </section>
         )}
 
+        {/* ----------------------------------------------------- */}
         {/* RESULTS */}
+        {/* ----------------------------------------------------- */}
         {result && (
           <>
+            {/* ------------------------------------------------- */}
             {/* EXPLAINABILITY */}
+            {/* ------------------------------------------------- */}
             <section className="card explanation-card">
               <div className="card-header">
                 <div>
@@ -231,31 +306,79 @@ function App() {
                   <h3>Policy Explanation</h3>
                 </div>
 
-                <span className="success-badge">SUCCESS</span>
+                <span className="success-badge">
+                  SUCCESS
+                </span>
               </div>
 
               <div className="explanation-grid">
+                {/* ACTION */}
                 <div className="explanation-item">
                   <span>Action</span>
-                  <strong>{result.policy?.action || '—'}</strong>
+
+                  <strong>
+                    {result.policy?.action || '—'}
+                  </strong>
                 </div>
 
+                {/* DIRECTION */}
                 <div className="explanation-item">
                   <span>Direction</span>
-                  <strong>{result.policy?.direction || '—'}</strong>
+
+                  <strong>
+                    {result.policy?.direction || '—'}
+                  </strong>
                 </div>
 
+                {/* CONDITIONS */}
+                <div className="explanation-item explanation-wide">
+                  <span>Conditions</span>
+
+                  <div className="conditions">
+                    {renderConditions()}
+                  </div>
+                </div>
+
+                {/* POLICY SUMMARY */}
+                <div className="policy-summary">
+                  <span>Policy Summary</span>
+
+                  <p>
+                    This policy will{' '}
+
+                    <strong>
+                      {result.policy?.action === 'ALLOW'
+                        ? 'allow'
+                        : 'deny'}
+                    </strong>{' '}
+
+                    matching{' '}
+
+                    <strong>
+                      {result.policy?.direction
+                        ? result.policy.direction.toLowerCase()
+                        : 'network'}
+                    </strong>{' '}
+
+                    traffic according to the conditions above.
+                  </p>
+                </div>
+
+                {/* IR */}
                 <div className="explanation-item explanation-wide">
                   <span>Intermediate Representation</span>
 
                   <code>
-                    {result.ir || 'IR not returned by the API'}
+                    {result.ir ||
+                      'IR not returned by the API'}
                   </code>
                 </div>
               </div>
             </section>
 
+            {/* ------------------------------------------------- */}
             {/* PIPELINE */}
+            {/* ------------------------------------------------- */}
             <section className="card pipeline-card">
               <div className="card-header">
                 <div>
@@ -263,13 +386,20 @@ function App() {
                   <h3>Compilation Status</h3>
                 </div>
 
-                <span className="success-badge">SUCCESS</span>
+                <span className="success-badge">
+                  SUCCESS
+                </span>
               </div>
 
               <div className="pipeline">
                 {STAGES.map(([key, label]) => (
-                  <div className="pipeline-stage" key={key}>
-                    <div className="stage-check">✓</div>
+                  <div
+                    className="pipeline-stage"
+                    key={key}
+                  >
+                    <div className="stage-check">
+                      ✓
+                    </div>
 
                     <div>
                       <b>{label}</b>
@@ -285,7 +415,9 @@ function App() {
               </div>
             </section>
 
+            {/* ------------------------------------------------- */}
             {/* GENERATED eBPF */}
+            {/* ------------------------------------------------- */}
             <section className="card output-card">
               <div className="card-header">
                 <div>
@@ -294,11 +426,17 @@ function App() {
                 </div>
 
                 <div className="output-actions">
-                  <button type="button" onClick={copyCode}>
+                  <button
+                    type="button"
+                    onClick={copyCode}
+                  >
                     Copy
                   </button>
 
-                  <button type="button" onClick={downloadCode}>
+                  <button
+                    type="button"
+                    onClick={downloadCode}
+                  >
                     Download .bpf.c
                   </button>
                 </div>
@@ -308,40 +446,60 @@ function App() {
                 <span></span>
                 <span></span>
                 <span></span>
-                {result.output_file || 'build / policy.bpf.c'}
+
+                {result.output_file ||
+                  'build / policy.bpf.c'}
               </div>
 
               <pre>
-                <code>{result.ebpf_code}</code>
+                <code>
+                  {result.ebpf_code}
+                </code>
               </pre>
             </section>
           </>
         )}
 
+        {/* ----------------------------------------------------- */}
         {/* INFORMATION CARDS */}
+        {/* ----------------------------------------------------- */}
         <section className="info-grid">
           <div className="card info-card">
             <small>LANGUAGE</small>
+
             <h3>PolicyLang</h3>
-            <p>Simple declarative network policy syntax.</p>
+
+            <p>
+              Simple declarative network policy syntax.
+            </p>
           </div>
 
           <div className="card info-card">
             <small>BACKEND</small>
+
             <h3>eBPF / TC</h3>
-            <p>Generates Linux traffic-control programs.</p>
+
+            <p>
+              Generates Linux traffic-control programs.
+            </p>
           </div>
 
           <div className="card info-card">
             <small>SUPPORTED</small>
+
             <h3>IPv4 · TCP · UDP · ICMP</h3>
+
             <p>
-              Network fields, comparisons and logical conditions.
+              Network fields, comparisons and logical
+              conditions.
             </p>
           </div>
         </section>
       </main>
 
+      {/* ------------------------------------------------------- */}
+      {/* FOOTER */}
+      {/* ------------------------------------------------------- */}
       <footer>
         <span>PolicyLang Compiler</span>
         <span>Built for programmable networking</span>

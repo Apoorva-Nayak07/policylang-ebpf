@@ -503,3 +503,67 @@ footer {
   background: #182130;
   color: #c3cddd;
 }
+
+.conditions {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.condition-row {
+  display: grid;
+  grid-template-columns: 1.2fr 70px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid #202b3a;
+  border-radius: 7px;
+  background: #080d15;
+}
+
+.condition-row > span {
+  margin: 0;
+  color: #b5c2d6;
+  font-family: Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.condition-row strong {
+  margin: 0;
+  color: #89a3ff;
+  font-size: 11px;
+  text-align: center;
+}
+
+.condition-row code {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #d7dfec;
+  font: 11px Consolas, monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logical-operator {
+  align-self: center;
+  color: #718096;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+@media (max-width: 700px) {
+  .condition-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .condition-row strong {
+    text-align: left;
+  }
+}
