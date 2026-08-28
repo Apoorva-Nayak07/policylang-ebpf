@@ -27,26 +27,26 @@ def compile_policy(input_path: Path) -> Path:
     print(f"Input: {input_path}")
     print()
 
-    print("[1/6] Lexing              ✓")
+    print("[1/6] Lexing              OK")
     print("[2/6] Parsing...")
     policy = parse(source)
-    print("       ✓")
+    print("       OK")
 
     print("[3/6] Semantic Analysis...")
     analyze(policy)
-    print("       ✓")
+    print("       OK")
 
     print("[4/6] IR Lowering...")
     ir = lower_policy(policy)
-    print("       ✓")
+    print("       OK")
 
     print("[5/6] Optimization...")
     optimized_ir = optimize_policy(ir)
-    print("       ✓")
+    print("       OK")
 
     print("[6/6] eBPF Generation...")
     ebpf_code = generate_ebpf_c(optimized_ir)
-    print("       ✓")
+    print("       OK")
 
     output_dir = Path("build")
     output_dir.mkdir(parents=True, exist_ok=True)

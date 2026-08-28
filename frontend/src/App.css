@@ -1,0 +1,406 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #080c14;
+  color: #e8edf7;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+.app {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 80% 10%, rgba(83, 110, 255, 0.08), transparent 30%),
+    #080c14;
+}
+
+.navbar {
+  height: 64px;
+  padding: 0 24px;
+  border-bottom: 1px solid #202938;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0a0f18;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #29364a;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: #111827;
+  font-weight: 800;
+}
+
+.brand h2 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.brand span {
+  color: #718096;
+  font-size: 10px;
+}
+
+.compiler-status {
+  color: #8b96a9;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  background: #55d99a;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #55d99a;
+}
+
+main {
+  width: min(1100px, calc(100% - 32px));
+  margin: auto;
+  padding: 55px 0 70px;
+}
+
+.hero-section {
+  margin-bottom: 36px;
+}
+
+.eyebrow,
+.card-header small,
+.info-card small {
+  color: #7f8da4;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.hero-section h1 {
+  font-size: clamp(38px, 6vw, 64px);
+  line-height: 0.98;
+  letter-spacing: -3px;
+  margin: 14px 0 18px;
+}
+
+.hero-section h1 span {
+  color: #89a3ff;
+}
+
+.hero-section > p {
+  max-width: 700px;
+  color: #8792a5;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.stage-card {
+  margin-top: 38px;
+  width: 170px;
+  padding: 16px;
+  border: 1px solid #273245;
+  border-radius: 10px;
+  background: #0d131e;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.stage-card strong {
+  color: #89a3ff;
+  font-size: 27px;
+}
+
+.stage-card b,
+.stage-card span {
+  display: block;
+}
+
+.stage-card b {
+  font-size: 11px;
+}
+
+.stage-card span {
+  color: #718096;
+  font-size: 9px;
+  margin-top: 4px;
+}
+
+.card {
+  border: 1px solid #222d3d;
+  background: #0c121c;
+  border-radius: 11px;
+  overflow: hidden;
+}
+
+.card-header {
+  min-height: 54px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #222d3d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-header h3 {
+  margin: 5px 0 0;
+  font-size: 12px;
+}
+
+.card-header > span {
+  color: #718096;
+  font-size: 10px;
+}
+
+.editor-card textarea {
+  display: block;
+  width: 100%;
+  min-height: 260px;
+  resize: vertical;
+  border: 0;
+  outline: none;
+  background: #080d15;
+  color: #dbe4f5;
+  padding: 22px 17px;
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.editor-footer {
+  min-height: 52px;
+  border-top: 1px solid #222d3d;
+  padding: 9px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.editor-footer > span {
+  color: #667388;
+  font-size: 10px;
+}
+
+.compile-button {
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 15px;
+  background: #8aa2ff;
+  color: #080c14;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.compile-button:hover {
+  background: #a2b5ff;
+}
+
+.compile-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.error-box {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid #65353d;
+  border-radius: 10px;
+  background: #1b1015;
+}
+
+.error-box strong {
+  color: #ff8585;
+}
+
+.error-box p {
+  color: #b99aa0;
+  font-size: 12px;
+  margin-bottom: 0;
+}
+
+.pipeline-card,
+.output-card {
+  margin-top: 18px;
+}
+
+.success-badge {
+  background: #103722;
+  color: #5de19c !important;
+  padding: 5px 9px;
+  border-radius: 5px;
+  font-size: 9px !important;
+  font-weight: 800;
+}
+
+.pipeline {
+  padding: 18px 20px 20px;
+}
+
+.pipeline-stage {
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  min-height: 45px;
+}
+
+.stage-check {
+  width: 22px;
+  height: 22px;
+  border: 1px solid #2d3b50;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #8b99ae;
+  font-size: 11px;
+}
+
+.pipeline-stage b,
+.pipeline-stage span {
+  display: block;
+}
+
+.pipeline-stage b {
+  font-size: 11px;
+}
+
+.pipeline-stage span {
+  margin-top: 3px;
+  color: #667388;
+  font-size: 9px;
+}
+
+.output-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.output-actions button {
+  border: 1px solid #29364a;
+  background: #111824;
+  color: #a8b4c7;
+  border-radius: 6px;
+  padding: 6px 9px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.output-actions button:hover {
+  background: #172131;
+}
+
+.file-path {
+  padding: 10px 14px;
+  border-bottom: 1px solid #1b2533;
+  color: #637087;
+  font: 10px Consolas, monospace;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.file-path span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #8d6671;
+}
+
+.file-path span:nth-child(2) {
+  background: #b59d61;
+}
+
+.file-path span:nth-child(3) {
+  background: #5c9a72;
+}
+
+.output-card pre {
+  margin: 0;
+  padding: 18px;
+  max-height: 550px;
+  overflow: auto;
+  background: #060a11;
+  color: #bac5d7;
+  font: 11px/1.7 Consolas, "Cascadia Code", monospace;
+}
+
+.info-grid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.info-card {
+  padding: 20px;
+}
+
+.info-card h3 {
+  font-size: 12px;
+  margin: 9px 0;
+}
+
+.info-card p {
+  color: #68758a;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+footer {
+  border-top: 1px solid #1e2735;
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  color: #566276;
+  font-size: 9px;
+}
+
+@media (max-width: 700px) {
+  main {
+    width: min(100% - 20px, 1100px);
+    padding-top: 35px;
+  }
+
+  .navbar {
+    padding: 0 12px;
+  }
+
+  .hero-section h1 {
+    letter-spacing: -2px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-header {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .output-actions {
+    flex-direction: column;
+  }
+
+  footer {
+    gap: 15px;
+    flex-direction: column;
+  }
+}
