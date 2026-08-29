@@ -1,76 +1,34 @@
-\# PolicyLang
-
-
+# PolicyLang
 
 PolicyLang is a domain-specific language and compiler for expressing
+human-readable network security policies and compiling them into
+explainable eBPF programs.
 
-human-readable security policies and compiling them into explainable eBPF programs.
+## Vision
 
+PolicyLang bridges the gap between high-level security intent and
+low-level eBPF execution.
 
+It allows users to write simple network security policies and transform
+them through a complete compiler pipeline into eBPF C code.
 
-\## Vision
-
-
-
-PolicyLang aims to bridge the gap between high-level security intent
-
-and low-level eBPF execution.
-
-
-
-\## Compiler Pipeline
-
-
-
-Policy
-
-↓
-
-Lexer
-
-↓
-
-Parser
-
-↓
-
-AST
-
-↓
-
-Semantic Analysis
-
-↓
-
-Policy IR
-
-↓
-
-Optimization
-
-↓
-
-eBPF Backend
-
-↓
-
-Runtime Execution
-
-↓
-
-Explanation
-
-
-
-\## Example
-
-
+## Compiler Pipeline
 
 ```text
-
-allow ingress
-
-when source.ip == "10.0.0.5"
-
-and destination.port == 443
-
+Policy Source
+     ↓
+Lexer
+     ↓
+Parser
+     ↓
+AST
+     ↓
+Semantic Analysis
+     ↓
+Policy IR
+     ↓
+Optimization
+     ↓
+eBPF Backend
+     ↓
+Generated eBPF C
